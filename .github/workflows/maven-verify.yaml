@@ -35,7 +35,6 @@ jobs:
     name: Build
     permissions:
       contents: read
-      packages: write
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ github.token }}
