@@ -10,7 +10,7 @@ on:
       directory:
         description: The directory in which to run the build.
         type: string
-        required: true
+        default: "."
       java-version:
         description: The version of Java to use.
         type: string
@@ -98,7 +98,6 @@ jobs:
             ]
       - name: Fetch Cached Maven Dependencies
         uses: actions/cache/restore@v5
-        continue-on-error: true
         with:
           key: maven-${{ needs.initialize-caches.outputs.date }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
@@ -106,12 +105,10 @@ jobs:
             maven-${{ needs.initialize-caches.outputs.year }}-${{ needs.initialize-caches.outputs.month }}
             maven-${{ needs.initialize-caches.outputs.year }}
             maven
-          fail-on-cache-miss: false
           path: |
             ~/.m2/repository
       - name: Fetch Cached NVD Data
         uses: actions/cache/restore@v5
-        continue-on-error: true
         with:
           key: owasp-${{ needs.initialize-caches.outputs.date }}
           restore-keys: |
@@ -131,6 +128,27 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: ${{ inputs.artifact-prefix }}-target
-          path: ${{ inputs.directory }}/target/
+          path: ${{ inputs.directory }}/**/target/
       - name: Publish Package
         run: mvn deploy
+  publish-test-results:
+    name: Publish Test Results
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: ${{ inputs.artifact-prefix }}-target
+          path: ${{ inputs.directory }}/
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action/linux@v2
+        if: (!cancelled())
+        continue-on-error: true
+        with:
+          check_name: "Java Test Results"
+          files: |
+            ${{ inputs.directory }}/**/target/surefire-reports/TEST-*.xml
+            ${{ inputs.directory }}/**/target/failsafe-reports/TEST-*.xml
+          comment_mode: off
