@@ -18,9 +18,9 @@ on:
 
 env: {}
 
-defaults:
-  run:
-    working-directory: ${{ inputs.directory }}
+#defaults:
+#  run:
+#    working-directory: ${{ inputs.directory }}
 
 jobs:
   initialize-caches:
@@ -42,6 +42,9 @@ jobs:
       packages: write
     env:
       GITHUB_TOKEN: ${{ github.token }}
+    defaults:
+      run:
+        working-directory: ${{ inputs.directory }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -138,6 +141,9 @@ jobs:
       - build
     permissions:
       checks: write
+    #defaults:
+    #  run:
+    #    working-directory: ${{ inputs.directory }}
     steps:
       - name: Download Artifacts
         uses: actions/download-artifact@v8
