@@ -1,0 +1,150 @@
+name: Cache Maven Dependencies
+
+on:
+  workflow_call:
+    inputs:
+      directory:
+        description: The directory in which to run the build.
+        type: string
+        default: "."
+      java-version:
+        description: The version of Java to use for initializing the Maven cache.
+        type: string
+        default: 25
+    outputs:
+      year:
+        description: The current year.
+        value: ${{ jobs.initialize-caches.outputs.year }}
+      month:
+        description: The current month.
+        value: ${{ jobs.initialize-caches.outputs.month }}
+      day:
+        description: The current day.
+        value: ${{ jobs.initialize-caches.outputs.day }}
+      date:
+        description: The current date (YYYY-mm-DD).
+        value: ${{ jobs.initialize-caches.outputs.date }}
+
+env: {}
+
+defaults:
+  run:
+    working-directory: ${{ inputs.directory }}
+
+jobs:
+  initialize-caches:
+    name: Initialize Caches
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      year: ${{ steps.get-date.outputs.year }}
+      month: ${{ steps.get-date.outputs.month }}
+      day: ${{ steps.get-date.outputs.day }}
+      date: ${{ steps.get-date.outputs.date }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - id: setup-java
+        name: Set up Temurin JDK ${{ inputs.java-version }}
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ inputs.java-version }}
+          distribution: temurin
+          java-package: jdk
+          overwrite-settings: false
+      # The setup-java action builds a settings file, but we want a better one
+      # that includes GitHub repositories across all projects for the owner.
+      - id: create-settings-file
+        name: Create Maven Settings
+        uses: s4u/maven-settings-action@v4.0.0
+        with:
+          githubServer: true
+          servers: |
+            [
+              {
+                "id": "github-${{ github.repository_owner }}",
+                "username": "${{ github.actor }}",
+                "password": "${{ github.token }}"
+              }
+            ]
+          repositories: |
+            [
+              {
+                "id": "github-${{ github.repository_owner }}",
+                "name": "GitHub ${{ github.repository_owner }}",
+                "url": "https://maven.pkg.github.com/${{ github.repository_owner }}/packages",
+                "snapshots": {"enabled": true}
+              }
+            ]
+          pluginRepositories: |
+            [
+              {
+                "id": "github-${{ github.repository_owner }}",
+                "name": "GitHub ${{ github.repository_owner }}",
+                "url": "https://maven.pkg.github.com/${{ github.repository_owner }}/packages",
+                "snapshots": {"enabled": true}
+              }
+            ]
+      # The setup-java action populates the toolchains file, but it only uses
+      # the new "marketing" version numbers.
+      - id: create-toolchains-file
+        name: Configure Maven Toolchains
+        uses: cactuslab/maven-toolchains-xml-action@v2
+        with:
+          toolchains: |
+            [
+              {"jdkVersion": "${{ steps.setup-java.outputs.version }}", "jdkHome": "${{ steps.setup-java.outputs.path }}"},
+              {"jdkVersion": "1.${{ steps.setup-java.outputs.version }}", "jdkHome": "${{ steps.setup-java.outputs.path }}"}
+            ]
+      - id: get-date
+        name: Get The Current Date
+        shell: bash
+        run: |
+          current_year=$(date -u "+%Y")
+          current_month=$(date -u "+%m")
+          current_day=$(date -u "+%d")
+          current_date=${current_year}-${current_month}-${current_day}
+          echo "::group::Current Date is ${current_date}"
+          echo "year=${current_year}"
+          echo "month=${current_month}"
+          echo "day=${current_day}"
+          echo "::endgroup::"
+          echo "year=${current_year}" >> "$GITHUB_OUTPUT"
+          echo "month=${current_month}" >> "$GITHUB_OUTPUT"
+          echo "day=${current_day}" >> "$GITHUB_OUTPUT"
+          echo "date=${current_date}" >> "$GITHUB_OUTPUT"
+      # Store the entire local Maven repository as a GitHub cache.
+      # This is stupid, but GitHub does not offer a non-stupid alternative.
+      - name: Cache Maven Dependencies
+        uses: actions/cache@v5
+        continue-on-error: true
+        with:
+          key: maven-${{ steps.get-date.outputs.date }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-${{ steps.get-date.outputs.year }}-${{ steps.get-date.outputs.month }}-${{ steps.get-date.outputs.day }}
+            maven-${{ steps.get-date.outputs.year }}-${{ steps.get-date.outputs.month }}
+            maven-${{ steps.get-date.outputs.year }}
+            maven
+          path: |
+            ~/.m2/repository
+      - name: Cache NVD Data
+        use: actions/cache@v5
+        continue-on-error: true
+        with:
+          key: owasp-${{ steps.get-date.outputs.date }}
+          restore-keys: |
+            owasp-${{ steps.get-date.outputs.year }}-${{ steps.get-date.outputs.month }}
+            owasp-${{ steps.get-date.outputs.year }}
+            owasp
+          path: |
+            ~/.m2/repository/org/owasp/dependency-check-data/
+      - name: Resolve Dependencies
+        continue-on-error: true
+        run: mvn dependency:go-offline
+      - name: Resolve PGP Keys
+        continue-on-error: true
+        run: mvn pgpverify:go-offline
+      - name: Update NVD Data
+        continue-on-error: true
+        run: mvn dependency-check:update-only
