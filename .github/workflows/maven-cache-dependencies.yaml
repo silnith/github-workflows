@@ -27,21 +27,20 @@ on:
 
 env: {}
 
-defaults:
-  run:
-    working-directory: ${{ inputs.directory }}
-
 jobs:
   initialize-caches:
     name: Initialize Caches
-    runs-on: ubuntu-latest
     permissions:
       contents: read
+    runs-on: ubuntu-latest
     outputs:
       year: ${{ steps.get-date.outputs.year }}
       month: ${{ steps.get-date.outputs.month }}
       day: ${{ steps.get-date.outputs.day }}
       date: ${{ steps.get-date.outputs.date }}
+    defaults:
+      run:
+        working-directory: ${{ inputs.directory }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
