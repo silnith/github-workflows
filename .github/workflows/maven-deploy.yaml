@@ -1,4 +1,4 @@
-name: Maven Verify
+name: Maven Deploy
 
 on:
   workflow_call:
