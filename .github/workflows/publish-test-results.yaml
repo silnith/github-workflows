@@ -1,0 +1,42 @@
+name: Test Results
+
+on:
+  workflow_call:
+    inputs:
+      check-name:
+        description: The name of the GitHub Check to publish.
+        type: string
+        required: true
+      artifact-pattern:
+        description: A file glob for the test result artifacts to download.
+        type: string
+        required: true
+      artifact-path:
+        description: The local path into which to merge the multiple downloaded artifacts.
+        type: string
+        required: true
+      test-result-files:
+        description: The test result files to publish.  These should come from the downloaded artifacts.
+        type: string
+        required: true
+
+jobs:
+  publish-test-results:
+    name: Publish Test Results
+    permissions:
+      checks: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: ${{ inputs.artifact-pattern }}
+          path: ${{ inputs.artifact-path }}
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action/linux@v2
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        with:
+          check_name: ${{ inputs.check-name }}
+          files: ${{ inputs.test-result-files }}
+          comment_mode: off

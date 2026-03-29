@@ -129,26 +129,3 @@ jobs:
         with:
           name: ${{ inputs.artifact-prefix }}-target
           path: ${{ inputs.directory }}/**/target/
-  publish-test-results:
-    name: Publish Test Results
-    permissions:
-      checks: write
-    needs:
-      - build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download Artifacts
-        uses: actions/download-artifact@v8
-        with:
-          name: ${{ inputs.artifact-prefix }}-target
-          path: ${{ inputs.directory }}/
-      - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action/linux@v2
-        if: (!cancelled())
-        continue-on-error: true
-        with:
-          check_name: "Java Test Results"
-          files: |
-            ${{ inputs.directory }}/**/target/surefire-reports/TEST-*.xml
-            ${{ inputs.directory }}/**/target/failsafe-reports/TEST-*.xml
-          comment_mode: off

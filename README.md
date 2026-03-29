@@ -2,6 +2,15 @@
 
 Standard GitHub workflows that use best practices for building and testing software.
 
+## C++
+
+```yaml
+jobs:
+  get-date:
+    name: Date
+    uses: silnith/github-workflows/.github/workflows/bash-get-date.yaml@main
+```
+
 ## .NET
 
 ```yaml
@@ -48,13 +57,15 @@ jobs:
     permissions:
       contents: read
   dotnet-test-results:
-    name: .NET Publish Test Results
+    name: .NET Test Results
     needs:
       - dotnet-build
-    uses: silnith/github-workflows/.github/workflows/dotnet-publish-test-results.yaml@main
+    uses: silnith/github-workflows/.github/workflows/publish-test-results.yaml@main
     with:
-      artifact-prefix: csharp
-      directory: .
+      check-name: .NET Test Results
+      artifact-pattern: csharp-dotnet-test-results-*
+      artifact-path: .
+      test-result-files: ./**/TestResults/**/*.trx
     secrets: inherit
     permissions:
       checks: write
@@ -95,6 +106,20 @@ jobs:
     secrets: inherit
     permissions:
       contents: read
+  maven-test-results:
+    name: Maven Test Results
+    needs:
+      - maven-verify
+    uses: silnith/github-workflows/.github/workflows/publish-test-results.yaml@main
+    with:
+      check-name: Java Test Results
+      artifact-pattern: java-target
+      artifact-path: .
+      test-result-files: |
+        ./**/target/surefire-reports/TEST-*.xml
+        ./**/target-failsafe-reports/TEST-*.xml
+    secrets: inherit
+    permissions:
       checks: write
   maven-deploy:
     name: Maven Deploy
