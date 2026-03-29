@@ -117,7 +117,7 @@ jobs:
       artifact-path: .
       test-result-files: |
         ./**/target/surefire-reports/TEST-*.xml
-        ./**/target-failsafe-reports/TEST-*.xml
+        ./**/target/failsafe-reports/TEST-*.xml
     secrets: inherit
     permissions:
       checks: write
