@@ -1,4 +1,4 @@
-# github-workflows
+# GitHub Reusable Workflows
 
 Standard GitHub workflows that use best practices for building and testing software.
 
