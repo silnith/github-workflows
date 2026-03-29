@@ -70,13 +70,13 @@ jobs:
       - name: Clean
         run: >-
           msbuild clean ${{ inputs.solution-file }}
-          --property:Platform=${{ inputs.platform }}
-          --property:Configuration=${{ inputs.configuration }}
+          -property:Platform=${{ inputs.platform }}
+          -property:Configuration=${{ inputs.configuration }}
       - name: Build
         run: >-
           msbuild build ${{ inputs.solution-file }}
-          --property:Platform=${{ inputs.platform }}
-          --property:Configuration=${{ inputs.configuration }}
+          -property:Platform=${{ inputs.platform }}
+          -property:Configuration=${{ inputs.configuration }}
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v7
         with:
