@@ -59,7 +59,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - id: setup-dotnet
-        name: Setup .NET
+        name: Setup .NET ${{ inputs.dotnet-versions }}
         uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{ inputs.dotnet-versions }}
@@ -69,12 +69,12 @@ jobs:
       - name: Fetch Cached .NET Dependencies
         uses: actions/cache/restore@v5
         with:
-          key: nuget-${{ inputs.year }}-${{ inputs.month }}-${{ inputs.day }}-${{ hashFiles('**/*.*proj') }}
+          key: dotnet-nuget-${{ inputs.year }}-${{ inputs.month }}-${{ inputs.day }}-${{ hashFiles('**/*.*proj') }}
           restore-keys: |
-            nuget-${{ inputs.year }}-${{ inputs.month }}-${{ inputs.day }}
-            nuget-${{ inputs.year }}-${{ inputs.month }}
-            nuget-${{ inputs.year }}
-            nuget
+            dotnet-nuget-${{ inputs.year }}-${{ inputs.month }}-${{ inputs.day }}
+            dotnet-nuget-${{ inputs.year }}-${{ inputs.month }}
+            dotnet-nuget-${{ inputs.year }}
+            dotnet-nuget
           path: ~/.nuget/packages/
       - name: Clean
         run: dotnet clean ${{ inputs.solution-file }} --configuration ${{ inputs.configuration }}

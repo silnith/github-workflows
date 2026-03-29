@@ -123,5 +123,5 @@ jobs:
         with:
           name: ${{ inputs.artifact-prefix }}-target
           path: ${{ inputs.directory }}/
-      - name: Publish Package
+      - name: Deploy
         run: mvn deploy
