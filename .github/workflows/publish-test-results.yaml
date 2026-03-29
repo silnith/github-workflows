@@ -30,7 +30,7 @@ jobs:
       - name: Download Artifacts
         uses: actions/download-artifact@v8
         with:
-          name: ${{ inputs.artifact-pattern }}
+          pattern: ${{ inputs.artifact-pattern }}
           path: ${{ inputs.artifact-path }}
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action/linux@v2
