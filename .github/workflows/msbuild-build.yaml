@@ -52,6 +52,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+      - id: setup-msbuild
+        name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v3
       - name: Fetch Cached NuGet Dependencies
         uses: actions/cache/restore@v5
         with:
