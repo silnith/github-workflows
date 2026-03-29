@@ -1,0 +1,93 @@
+name: .Net Cache Dependencies
+
+on:
+  workflow_call:
+    inputs:
+      directory:
+        description: The directory in which to run the build.
+        type: string
+        default: "."
+      solution-file:
+        description: The name of the solution file.
+        type: string
+        required: true
+      dotnet-versions:
+        description: A version or set of versions of .NET to setup.
+        type: string
+        required: true
+      year:
+        description: The current year.
+        type: string
+        required: true
+      month:
+        description: The current month.
+        type: string
+        required: true
+      day:
+        description: The current day.
+        type: string
+        required: true
+    secrets: {}
+    outputs:
+      dotnet-version:
+        description: The version of .NET installed.  (If more than one was specified, which one?)
+        # https://github.com/actions/setup-dotnet#dotnet-version
+        value: ${{ jobs.setup.outputs.dotnet-version }}
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  setup:
+    name: Cache NuGet Dependencies
+    permissions:
+      contents: read
+    runs-on: windows-2022
+    outputs:
+      dotnet-version: ${{ steps.job-outputs.outputs.dotnet-version }}
+    env:
+      DOTNET_NOLOGO: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+    defaults:
+      run:
+        working-directory: ${{ inputs.directory }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - id: setup-dotnet
+        name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ inputs.dotnet-versions }}
+          source-url: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Cache .NET Dependencies
+        uses: actions/cache@v5
+        continue-on-error: true
+        with:
+          key: dotnet-nuget-${{ inputs.year }}-${{ inputs.month }}-${{ inputs.day }}-${{ hashFiles('**/*.*proj') }}
+          restore-keys: |
+            dotnet-nuget-${{ inputs.year }}-${{ inputs.month }}-${{ inputs.day }}
+            dotnet-nuget-${{ inputs.year }}-${{ inputs.month }}
+            dotnet-nuget-${{ inputs.year }}
+            dotnet-nuget
+          path: ~/.nuget/packages/
+#      - name: Add GitHub NuGet Source
+#        #env:
+#        #  NuGetPackageSourceCredentials_GitHub: "Username=${{ github.actor }};Password=${{ secrets.GITHUB_TOKEN }}"
+#        #  GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+#        run: |
+#          dotnet nuget add source
+#          https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+#          --name GitHub
+#          --username ${{ github.actor }}
+#          --password %GITHUB_TOKEN%
+      - name: .NET Tool Restore
+        run: dotnet tool restore
+      - name: .NET Restore
+        run: dotnet restore ${{ inputs.solution-file }}
+      - id: job-outputs
+        run: |
+          echo "dotnet-version=${{ steps.setup-dotnet.outputs.dotnet-version }}" >> $GITHUB_OUTPUT

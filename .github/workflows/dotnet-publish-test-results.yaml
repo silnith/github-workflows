@@ -1,0 +1,36 @@
+name: .Net Test Results
+
+on:
+  workflow_call:
+    inputs:
+      artifact-prefix:
+        description: A prefix for artifact names.
+        type: string
+        required: true
+      directory:
+        description: The directory in which to run the build.
+        type: string
+        default: "."
+
+jobs:
+  publish-test-results:
+    name: Publish .NET Test Results
+    permissions:
+      checks: write
+    runs-on: windows-2022
+    steps:
+      - name: Download Test Results Artifacts
+        uses: actions/download-artifact@v8
+        with:
+          pattern: ${{ inputs.artifact-prefix }}-dotnet-test-results-*
+          path: ${{ inputs.directory }}
+          merge-multiple: true
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action/windows@v2
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        with:
+          check_name: ".NET Test Results"
+          files: |
+            ${{ inputs.directory }}/**/TestResults/**/*.trx
+          comment_mode: off
