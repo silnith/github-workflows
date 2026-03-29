@@ -40,7 +40,7 @@ on:
 
 jobs:
   build:
-    name: Build
+    name: Build (Intel)
     permissions:
       contents: read
     runs-on: windows-2022
