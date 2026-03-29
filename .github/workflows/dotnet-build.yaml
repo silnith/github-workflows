@@ -89,7 +89,7 @@ jobs:
             ${{ inputs.directory }}/**/obj/
           if-no-files-found: error
       - name: Test
-        run: |
+        run: >-
           dotnet test ${{ inputs.solution-file }}
           --configuration ${{ inputs.configuration }}
           --collect "Code Coverage"
