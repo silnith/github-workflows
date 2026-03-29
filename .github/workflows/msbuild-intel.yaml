@@ -1,0 +1,91 @@
+name: MSBuild (Intel)
+
+on:
+  workflow_call:
+    inputs:
+      artifact-prefix:
+        description: A prefix for artifact names.
+        type: string
+        required: true
+      directory:
+        description: The directory in which to run the build.
+        type: string
+        default: "."
+      solution-file:
+        description: The name of the solution file.
+        type: string
+        required: true
+      platform:
+        description: The build architecture.  (x86, x64)
+        type: string
+        required: true
+      configuration:
+        description: The build configuration.  (Debug, Release)
+        type: string
+        required: true
+      year:
+        description: The current year.
+        type: string
+        required: true
+      month:
+        description: The current month.
+        type: string
+        required: true
+      day:
+        description: The current day.
+        type: string
+        required: true
+    secrets: {}
+    outputs: {}
+
+jobs:
+  build:
+    name: Build
+    permissions:
+      contents: read
+    runs-on: windows-2022
+    outputs: {}
+    env: {}
+    defaults:
+      run:
+        working-directory: ${{ inputs.directory }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - id: setup-msbuild
+        name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v3
+      - name: Fetch Cached NuGet Dependencies
+        uses: actions/cache/restore@v5
+        with:
+          key: nuget-${{ inputs.year }}-${{ inputs.month }}-${{ inputs.day }}-${{ hashFiles('**/*.*proj') }}
+          restore-keys: |
+            nuget-${{ inputs.year }}-${{ inputs.month }}-${{ inputs.day }}
+            nuget-${{ inputs.year }}-${{ inputs.month }}
+            nuget-${{ inputs.year }}
+            nuget
+          path: ~/.nuget/packages/
+      - name: NuGet Restore
+        run: nuget restore ${{ inputs.solution-file }} -NonInteractive
+      - name: Build
+        run: >-
+          msbuild ${{ inputs.solution-file }}
+          -property:Platform=${{ inputs.platform }}
+          -property:Configuration=${{ inputs.configuration }}
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ inputs.artifact-prefix }}-msbuild-build-${{ inputs.platform }}-${{ inputs.configuration }}
+          path: |
+            ${{ inputs.directory }}/**/${{ inputs.configuration }}/
+          if-no-files-found: error
+      - name: Test
+        run: '& "$(vswhere -property installationPath)/Common7/IDE/Extensions/TestPlatform/vstest.console.exe" "./**/*test*.dll" /EnableCodeCoverage'
+      - name: Upload Test Results Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ inputs.artifact-prefix }}-vstest-test-results-${{ inputs.platform }}-${{ inputs.configuration }}
+          path: |
+            ${{ inputs.directory }}/**/TestResults/**/*.trx
+            ${{ inputs.directory }}/**/*.coverage
+          if-no-files-found: error
