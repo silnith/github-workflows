@@ -69,7 +69,7 @@ jobs:
       - name: Fetch Cached .NET Dependencies
         uses: actions/cache/restore@v5
         with:
-          key: nuget-${{ inputs.year }}-${{ inputs.month }}-${{ inputs.day }}-${{ hasFiles('**/*.*proj') }}
+          key: nuget-${{ inputs.year }}-${{ inputs.month }}-${{ inputs.day }}-${{ hashFiles('**/*.*proj') }}
           restore-keys: |
             nuget-${{ inputs.year }}-${{ inputs.month }}-${{ inputs.day }}
             nuget-${{ inputs.year }}-${{ inputs.month }}
