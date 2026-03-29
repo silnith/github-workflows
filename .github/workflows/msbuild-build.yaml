@@ -69,7 +69,7 @@ jobs:
         run: nuget restore ${{ inputs.solution-file }} -NonInteractive
       - name: Build
         run: >-
-          msbuild build ${{ inputs.solution-file }}
+          msbuild ${{ inputs.solution-file }}
           -property:Platform=${{ inputs.platform }}
           -property:Configuration=${{ inputs.configuration }}
       - name: Upload Build Artifacts
