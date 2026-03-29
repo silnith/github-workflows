@@ -14,7 +14,7 @@ on:
 
 jobs:
   publish-test-results:
-    name: Publish .NET Test Results
+    name: Publish Test Results
     permissions:
       checks: write
     runs-on: windows-2022
