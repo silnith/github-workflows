@@ -35,8 +35,6 @@ on:
         description: The current day.
         type: string
         required: true
-    secrets: {}
-    outputs: {}
 
 jobs:
   build:
@@ -45,8 +43,6 @@ jobs:
       contents: read
       packages: read
     runs-on: windows-11-arm
-    outputs: {}
-    env: {}
     defaults:
       run:
         working-directory: ${{ inputs.directory }}

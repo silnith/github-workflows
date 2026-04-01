@@ -27,16 +27,11 @@ on:
         description: The current day.
         type: string
         required: true
-    secrets: {}
     outputs:
       dotnet-version:
-        description: The version of .NET installed.  (If more than one was specified, which one?)
+        description: The version of .NET installed.  (If more than one was specified, the highest version.)
         # https://github.com/actions/setup-dotnet#dotnet-version
         value: ${{ jobs.setup.outputs.dotnet-version }}
-
-env:
-  DOTNET_NOLOGO: true
-  DOTNET_CLI_TELEMETRY_OPTOUT: true
 
 jobs:
   setup:

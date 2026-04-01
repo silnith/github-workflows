@@ -24,8 +24,6 @@ on:
         type: string
         required: true
 
-env: {}
-
 jobs:
   initialize-caches:
     name: Initialize Caches

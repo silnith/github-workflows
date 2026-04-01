@@ -35,12 +35,6 @@ on:
         description: The current day.
         type: string
         required: true
-    secrets: {}
-    outputs: {}
-
-env:
-  DOTNET_NOLOGO: true
-  DOTNET_CLI_TELEMETRY_OPTOUT: true
 
 jobs:
   build:
@@ -49,7 +43,6 @@ jobs:
       contents: read
       packages: read
     runs-on: windows-2022
-    outputs: {}
     env:
       DOTNET_NOLOGO: true
       DOTNET_CLI_TELEMETRY_OPTOUT: true

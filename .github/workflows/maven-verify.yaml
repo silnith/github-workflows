@@ -28,8 +28,6 @@ on:
         type: string
         required: true
 
-env: {}
-
 jobs:
   build:
     name: Verify
