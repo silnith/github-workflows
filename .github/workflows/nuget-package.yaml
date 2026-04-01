@@ -1,0 +1,52 @@
+name: NuGet Package
+
+on:
+  workflow_call:
+    inputs:
+      artifact-prefix:
+        description: A prefix for artifact names.
+        type: string
+        default: "nuget"
+      artifacts-pattern:
+        description: The file glob pattern for all the build artifacts needed to create the NuGet package.
+        type: string
+        default: "msbuild-build-*"
+      directory:
+        description: The directory in which to run the build.
+        type: string
+        default: "."
+      base-path:
+        description: The relative directory against which the nuspec files are resolved.
+        type: string
+        required: true
+      nuspec-file:
+        description: The path of the nuspec file, relative to the base path.
+        type: string
+        required: true
+
+jobs:
+  build:
+    name: Package
+    permissions:
+      contents: read
+    runs-on: windows-2022
+    defaults:
+      run:
+        working-directory: ${{ inputs.directory }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v8
+        with:
+          pattern: ${{ inputs.artifacts-pattern }}
+          path: ${{ inputs.directory }}
+          merge-multiple: true
+      - name: Pack
+        run: nuget pack ${{ inputs.base-path }}/${{ inputs.nuspec-file }} -BasePath ${{ inputs.base-path }} -NonInteractive
+      - name: Upload NuGet Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ artifact.prefix }}-package
+          path: ${{ inputs.directory }}/*.*nupkg
+
