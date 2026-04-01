@@ -14,7 +14,7 @@ on:
       artifact-path:
         description: The local path into which to merge the multiple downloaded artifacts.
         type: string
-        required: true
+        default: "."
       test-result-files:
         description: The test result files to publish.  These should come from the downloaded artifacts.
         type: string

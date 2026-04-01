@@ -6,7 +6,7 @@ on:
       artifact-prefix:
         description: A prefix for artifact names.
         type: string
-        required: true
+        default: maven
       directory:
         description: The directory in which to run the build.
         type: string

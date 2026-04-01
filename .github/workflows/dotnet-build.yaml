@@ -6,7 +6,7 @@ on:
       artifact-prefix:
         description: A prefix for artifact names.
         type: string
-        required: true
+        default: dotnet
       directory:
         description: The directory in which to run the build.
         type: string
@@ -83,7 +83,7 @@ jobs:
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: ${{ inputs.artifact-prefix }}-dotnet-build-${{ inputs.configuration }}
+          name: ${{ inputs.artifact-prefix }}-build-${{ inputs.configuration }}
           path: |
             ${{ inputs.directory }}/**/bin/
             ${{ inputs.directory }}/**/obj/
@@ -98,7 +98,7 @@ jobs:
       - name: Upload Test Results Artifact
         uses: actions/upload-artifact@v7
         with:
-          name: ${{ inputs.artifact-prefix }}-dotnet-test-results-${{ inputs.configuration }}
+          name: ${{ inputs.artifact-prefix }}-test-results-${{ inputs.configuration }}
           path: |
             ${{ inputs.directory }}/**/TestResults/**/*.trx
             ${{ inputs.directory }}/**/*.coverage

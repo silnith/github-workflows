@@ -6,7 +6,7 @@ on:
       artifact-prefix:
         description: A prefix for artifact names.
         type: string
-        required: true
+        default: msbuild
       directory:
         description: The directory in which to run the build.
         type: string
@@ -18,11 +18,11 @@ on:
       platform:
         description: The build architecture.  (ARM, ARM64)
         type: string
-        required: true
+        default: ARM64
       configuration:
         description: The build configuration.  (Debug, Release)
         type: string
-        required: true
+        default: Release
       year:
         description: The current year.
         type: string
@@ -75,7 +75,7 @@ jobs:
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: ${{ inputs.artifact-prefix }}-msbuild-build-${{ inputs.platform }}-${{ inputs.configuration }}
+          name: ${{ inputs.artifact-prefix }}-build-${{ inputs.platform }}-${{ inputs.configuration }}
           path: |
             ${{ inputs.directory }}/**/${{ inputs.configuration }}/
           if-no-files-found: error
