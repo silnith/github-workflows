@@ -86,7 +86,7 @@ jobs:
           if-no-files-found: error
       - name: Test
         continue-on-error: true
-        run: '& "$(vswhere -property installationPath)/Common7/IDE/Extensions/TestPlatform/vstest.console.exe" "./**/*test*.dll" /EnableCodeCoverage'
+        run: '& "$(vswhere -property installationPath)/Common7/IDE/Extensions/TestPlatform/vstest.console.exe" "./**/*test*.dll" /Logger:trx /EnableCodeCoverage'
       - name: Upload Test Results Artifact
         uses: actions/upload-artifact@v7
         with:

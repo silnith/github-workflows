@@ -88,7 +88,7 @@ jobs:
         # Path does not exist: \Common7\IDE\Extensions\TestPlatform\testhost.arm.exe
         if: ${{ inputs.platform != 'ARM' }}
         continue-on-error: true
-        run: '& "$(vswhere -property installationPath)/Common7/IDE/Extensions/TestPlatform/vstest.console.arm64.exe" "./**/*test*.dll" /EnableCodeCoverage'
+        run: '& "$(vswhere -property installationPath)/Common7/IDE/Extensions/TestPlatform/vstest.console.arm64.exe" "./**/*test*.dll" /Logger:trx /EnableCodeCoverage'
       - name: Upload Test Results Artifact
         uses: actions/upload-artifact@v7
         with:
