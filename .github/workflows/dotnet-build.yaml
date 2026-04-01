@@ -100,4 +100,4 @@ jobs:
           path: |
             ${{ inputs.directory }}/**/TestResults/**/*.trx
             ${{ inputs.directory }}/**/*.coverage
-          if-no-files-found: error
+          if-no-files-found: warn
