@@ -9,6 +9,87 @@ jobs:
   get-date:
     name: Date
     uses: silnith/github-workflows/.github/workflows/bash-get-date.yaml@main
+  cpp-nuget:
+    name: NuGet Cache
+    needs:
+      - get-date
+    uses: silnith/github-workflows/.github/workflows/nuget-cache-dependencies.yaml@main
+    with:
+      directory: .
+      solution-file: foo.sln
+      year: ${{ needs.get-date.outputs.year }}
+      month: ${{ needs.get-date.outputs.month }}
+      day: ${{ needs.get-date.outputs.day }}
+    secrets: inherit
+    permissions:
+      contents: read
+  cpp-build-intel:
+    name: C++ Intel
+    needs:
+      - get-date
+      - cpp-nuget
+    strategy:
+      matrix:
+        platform:
+          - x86
+          - x64
+        configuration:
+          - Debug
+          - Release
+    uses: silnith/github-workflows/.github/workflows/msbuild-intel.yaml@main
+    with:
+      artifact-prefix: cpp
+      directory: .
+      solution-file: foo.sln
+      platform: ${{ matrix.platform }}
+      configuration: ${{ matrix.configuration }}
+      year: ${{ needs.get-date.outputs.year }}
+      month: ${{ needs.get-date.outputs.month }}
+      day: ${{ needs.get-date.outputs.day }}
+    secrets: inherit
+    permissions:
+      contents: read
+  cpp-build-arm:
+    name: C++ ARM
+    needs:
+      - get-date
+      - cpp-nuget
+    strategy:
+      matrix:
+        platform:
+          - ARM
+          - ARM64
+        configuration:
+          - Debug
+          - Release
+    uses: silnith/github-workflows/.github/workflows/msbuild-arm.yaml@main
+    with:
+      artifact-prefix: cpp
+      directory: .
+      solution-file: foo.sln
+      platform: ${{ matrix.platform }}
+      configuration: ${{ matrix.configuration }}
+      year: ${{ needs.get-date.outputs.year }}
+      month: ${{ needs.get-date.outputs.month }}
+      day: ${{ needs.get-date.outputs.day }}
+    secrets: inherit
+    permissions:
+      contents: read
+  cpp-test-results:
+    name: Publish VSTest Results
+    needs:
+      - cpp-build-intel
+      - cpp-build-arm
+    uses: silnith/github-workflows/.github/workflows/publish-test-results.yaml@main
+    with:
+      check-name: C++ Test Results
+      artifact-pattern: cpp-vstest-test-results-*
+      artifact-path: .
+      test-result-files: |
+        cpp/**/TestResults/**/*.trx
+    secrets: inherit
+    permissions:
+      checks: write
 ```
 
 ## .NET
