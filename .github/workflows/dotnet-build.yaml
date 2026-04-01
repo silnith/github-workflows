@@ -70,6 +70,10 @@ jobs:
             dotnet-nuget-${{ inputs.year }}
             dotnet-nuget
           path: ~/.nuget/packages/
+      - name: Tool Restore
+        run: dotnet tool restore
+      - name: Restore
+        run: dotnet restore ${{ inputs.solution-file }}
       - name: Clean
         run: dotnet clean ${{ inputs.solution-file }} --configuration ${{ inputs.configuration }}
       - name: Build
