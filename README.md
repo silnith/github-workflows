@@ -11,6 +11,9 @@ jobs:
     uses: silnith/github-workflows/.github/workflows/bash-get-date.yaml@main
   cpp-nuget:
     name: NuGet Cache
+    permissions:
+      contents: read
+      packages: read
     needs:
       - get-date
     uses: silnith/github-workflows/.github/workflows/nuget-cache-dependencies.yaml@main
@@ -21,11 +24,11 @@ jobs:
       month: ${{ needs.get-date.outputs.month }}
       day: ${{ needs.get-date.outputs.day }}
     secrets: inherit
+  cpp-build-intel:
+    name: C++ Intel
     permissions:
       contents: read
       packages: read
-  cpp-build-intel:
-    name: C++ Intel
     needs:
       - get-date
       - cpp-nuget
@@ -48,11 +51,11 @@ jobs:
       month: ${{ needs.get-date.outputs.month }}
       day: ${{ needs.get-date.outputs.day }}
     secrets: inherit
+  cpp-build-arm:
+    name: C++ ARM
     permissions:
       contents: read
       packages: read
-  cpp-build-arm:
-    name: C++ ARM
     needs:
       - get-date
       - cpp-nuget
@@ -75,11 +78,10 @@ jobs:
       month: ${{ needs.get-date.outputs.month }}
       day: ${{ needs.get-date.outputs.day }}
     secrets: inherit
-    permissions:
-      contents: read
-      packages: read
   cpp-test-results:
     name: Publish VSTest Results
+    permissions:
+      checks: write
     needs:
       - cpp-build-intel
       - cpp-build-arm
@@ -91,8 +93,6 @@ jobs:
       test-result-files: |
         cpp/**/TestResults/**/*.trx
     secrets: inherit
-    permissions:
-      checks: write
 ```
 
 ## .NET
@@ -104,6 +104,9 @@ jobs:
     uses: silnith/github-workflows/.github/workflows/bash-get-date.yaml@main
   dotnet-cache:
     name: .NET Cache
+    permissions:
+      contents: read
+      packages: read
     needs:
       - get-date
     uses: silnith/github-workflows/.github/workflows/dotnet-cache-dependencies.yaml@main
@@ -115,11 +118,11 @@ jobs:
       month: ${{ needs.get-date.outputs.month }}
       day: ${{ needs.get-date.outputs.day }}
     secrets: inherit
+  dotnet-build:
+    name: .NET
     permissions:
       contents: read
       packages: read
-  dotnet-build:
-    name: .NET
     needs:
       - get-date
       - dotnet-cache
@@ -139,11 +142,10 @@ jobs:
       month: ${{ needs.get-date.outputs.month }}
       day: ${{ needs.get-date.outputs.day }}
     secrets: inherit
-    permissions:
-      contents: read
-      packages: read
   dotnet-test-results:
     name: .NET Test Results
+    permissions:
+      checks: write
     needs:
       - dotnet-build
     uses: silnith/github-workflows/.github/workflows/publish-test-results.yaml@main
@@ -153,8 +155,6 @@ jobs:
       artifact-path: .
       test-result-files: ./**/TestResults/**/*.trx
     secrets: inherit
-    permissions:
-      checks: write
 ```
 
 ## Java
@@ -166,6 +166,9 @@ jobs:
     uses: silnith/github-workflows/.github/workflows/bash-get-date.yaml@main
   maven-cache:
     name: Maven Cache
+    permissions:
+      contents: read
+      packages: read
     needs:
       - get-date
     uses: silnith/github-workflows/.github/workflows/maven-cache-dependencies.yaml@main
@@ -175,11 +178,11 @@ jobs:
       month: ${{ needs.get-date.outputs.month }}
       day: ${{ needs.get-date.outputs.day }}
     secrets: inherit
+  maven-verify:
+    name: Maven
     permissions:
       contents: read
       packages: read
-  maven-verify:
-    name: Maven
     needs:
       - get-date
       - maven-cache
@@ -191,26 +194,11 @@ jobs:
       month: ${{ needs.get-date.outputs.month }}
       day: ${{ needs.get-date.outputs.day }}
     secrets: inherit
-    permissions:
-      contents: read
-      packages: read
-  maven-test-results:
-    name: Maven Test Results
-    needs:
-      - maven-verify
-    uses: silnith/github-workflows/.github/workflows/publish-test-results.yaml@main
-    with:
-      check-name: Java Test Results
-      artifact-pattern: java-target
-      artifact-path: .
-      test-result-files: |
-        ./**/target/surefire-reports/TEST-*.xml
-        ./**/target/failsafe-reports/TEST-*.xml
-    secrets: inherit
-    permissions:
-      checks: write
   maven-deploy:
     name: Maven Deploy
+    permissions:
+      contents: read
+      packages: write
     needs:
       - get-date
       - maven-cache
@@ -223,7 +211,19 @@ jobs:
       month: ${{ needs.get-date.outputs.month }}
       day: ${{ needs.get-date.outputs.day }}
     secrets: inherit
+  maven-test-results:
+    name: Maven Test Results
     permissions:
-      contents: read
-      packages: write
+      checks: write
+    needs:
+      - maven-verify
+    uses: silnith/github-workflows/.github/workflows/publish-test-results.yaml@main
+    with:
+      check-name: Java Test Results
+      artifact-pattern: java-target
+      artifact-path: .
+      test-result-files: |
+        ./**/target/surefire-reports/TEST-*.xml
+        ./**/target/failsafe-reports/TEST-*.xml
+    secrets: inherit
 ```
