@@ -56,6 +56,14 @@ jobs:
       - id: setup-msbuild
         name: Setup MSBuild
         uses: microsoft/setup-msbuild@v3
+      - name: Configure GitHub Packages
+        run: >-
+          nuget sources add
+          -Name GitHub
+          -UserName ${{ github.actor }}
+          -Password ${{ secrets.GITHUB_TOKEN }}
+          -Source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+          -NonInteractive
       - name: Fetch Cached NuGet Dependencies
         uses: actions/cache/restore@v5
         with:
