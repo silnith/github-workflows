@@ -75,16 +75,6 @@ jobs:
             dotnet-nuget-${{ inputs.year }}
             dotnet-nuget
           path: ~/.nuget/packages/
-#      - name: Add GitHub NuGet Source
-#        #env:
-#        #  NuGetPackageSourceCredentials_GitHub: "Username=${{ github.actor }};Password=${{ secrets.GITHUB_TOKEN }}"
-#        #  GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-#        run: |
-#          dotnet nuget add source
-#          https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
-#          --name GitHub
-#          --username ${{ github.actor }}
-#          --password %GITHUB_TOKEN%
       - name: Tool Restore
         run: dotnet tool restore
       - name: Restore
