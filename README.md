@@ -23,6 +23,7 @@ jobs:
     secrets: inherit
     permissions:
       contents: read
+      packages: read
   cpp-build-intel:
     name: C++ Intel
     needs:
@@ -49,6 +50,7 @@ jobs:
     secrets: inherit
     permissions:
       contents: read
+      packages: read
   cpp-build-arm:
     name: C++ ARM
     needs:
@@ -75,6 +77,7 @@ jobs:
     secrets: inherit
     permissions:
       contents: read
+      packages: read
   cpp-test-results:
     name: Publish VSTest Results
     needs:
@@ -114,6 +117,7 @@ jobs:
     secrets: inherit
     permissions:
       contents: read
+      packages: read
   dotnet-build:
     name: .NET
     needs:
@@ -137,6 +141,7 @@ jobs:
     secrets: inherit
     permissions:
       contents: read
+      packages: read
   dotnet-test-results:
     name: .NET Test Results
     needs:
@@ -172,6 +177,7 @@ jobs:
     secrets: inherit
     permissions:
       contents: read
+      packages: read
   maven-verify:
     name: Maven
     needs:
@@ -187,6 +193,7 @@ jobs:
     secrets: inherit
     permissions:
       contents: read
+      packages: read
   maven-test-results:
     name: Maven Test Results
     needs:

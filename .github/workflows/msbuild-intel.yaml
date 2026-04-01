@@ -43,6 +43,7 @@ jobs:
     name: Build (Intel)
     permissions:
       contents: read
+      packages: read
     runs-on: windows-2022
     outputs: {}
     env: {}

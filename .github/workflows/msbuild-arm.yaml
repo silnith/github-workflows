@@ -43,6 +43,7 @@ jobs:
     name: Build (ARM)
     permissions:
       contents: read
+      packages: read
     runs-on: windows-11-arm
     outputs: {}
     env: {}

@@ -43,6 +43,7 @@ jobs:
     name: Initialize Package Cache
     permissions:
       contents: read
+      packages: read
     runs-on: windows-2022
     outputs:
       dotnet-version: ${{ steps.job-outputs.outputs.dotnet-version }}
