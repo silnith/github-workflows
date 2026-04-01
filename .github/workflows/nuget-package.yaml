@@ -47,6 +47,6 @@ jobs:
       - name: Upload NuGet Artifact
         uses: actions/upload-artifact@v7
         with:
-          name: ${{ artifact.prefix }}-package
+          name: ${{ inputs.artifact-prefix }}-package
           path: ${{ inputs.directory }}/*.*nupkg
 

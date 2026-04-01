@@ -36,8 +36,8 @@ jobs:
       - name: Download NuGet Artifact
         uses: actions/download-artifact@v8
         with:
-          name: ${{ artifact.prefix }}-package
-          path: ${{ input.directory }}
+          name: ${{ inputs.artifact-prefix }}-package
+          path: ${{ inputs.directory }}
       - name: Push
         run: >-
           nuget push *.nupkg
