@@ -1,4 +1,4 @@
-name: MSBuild (Intel)
+name: MSBuild Intel
 
 on:
   workflow_call:
@@ -38,7 +38,7 @@ on:
 
 jobs:
   build:
-    name: Build (Intel)
+    name: Build Intel
     permissions:
       contents: read
       packages: read

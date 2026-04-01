@@ -14,7 +14,7 @@ on:
 
 jobs:
   setup:
-    name: NuGet Push
+    name: Push
     permissions:
       contents: read
       packages: write
