@@ -1,4 +1,4 @@
-name: Date
+name: Get Date
 
 on:
   workflow_call:

@@ -1,4 +1,4 @@
-name: Maven Verify
+name: Maven Deploy
 
 on:
   workflow_call:
@@ -6,7 +6,7 @@ on:
       artifact-prefix:
         description: A prefix for artifact names.
         type: string
-        required: true
+        default: maven
       directory:
         description: The directory in which to run the build.
         type: string
@@ -27,8 +27,6 @@ on:
         description: The current day.
         type: string
         required: true
-
-env: {}
 
 jobs:
   deploy:
@@ -125,5 +123,5 @@ jobs:
         with:
           name: ${{ inputs.artifact-prefix }}-target
           path: ${{ inputs.directory }}/
-      - name: Publish Package
+      - name: Deploy
         run: mvn deploy

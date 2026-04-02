@@ -24,13 +24,12 @@ on:
         type: string
         required: true
 
-env: {}
-
 jobs:
   initialize-caches:
     name: Initialize Caches
     permissions:
       contents: read
+      packages: read
     runs-on: ubuntu-latest
     defaults:
       run:

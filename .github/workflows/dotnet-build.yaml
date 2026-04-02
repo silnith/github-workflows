@@ -1,0 +1,103 @@
+name: .Net Build
+
+on:
+  workflow_call:
+    inputs:
+      artifact-prefix:
+        description: A prefix for artifact names.
+        type: string
+        default: dotnet
+      directory:
+        description: The directory in which to run the build.
+        type: string
+        default: "."
+      solution-file:
+        description: The name of the solution file.
+        type: string
+        required: true
+      configuration:
+        description: The build configuration.  Debug or Release.
+        type: string
+        default: Release
+      dotnet-versions:
+        description: A version or set of versions of .NET to setup.
+        type: string
+        required: true
+      year:
+        description: The current year.
+        type: string
+        required: true
+      month:
+        description: The current month.
+        type: string
+        required: true
+      day:
+        description: The current day.
+        type: string
+        required: true
+
+jobs:
+  build:
+    name: Build
+    permissions:
+      contents: read
+      packages: read
+    runs-on: windows-2022
+    env:
+      DOTNET_NOLOGO: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+    defaults:
+      run:
+        working-directory: ${{ inputs.directory }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - id: setup-dotnet
+        name: Setup .NET ${{ inputs.dotnet-versions }}
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ inputs.dotnet-versions }}
+          source-url: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Fetch Cached .NET Dependencies
+        uses: actions/cache/restore@v5
+        with:
+          key: dotnet-nuget-${{ inputs.year }}-${{ inputs.month }}-${{ inputs.day }}-${{ hashFiles('**/*.*proj') }}
+          restore-keys: |
+            dotnet-nuget-${{ inputs.year }}-${{ inputs.month }}-${{ inputs.day }}
+            dotnet-nuget-${{ inputs.year }}-${{ inputs.month }}
+            dotnet-nuget-${{ inputs.year }}
+            dotnet-nuget
+          path: ~/.nuget/packages/
+      - name: Tool Restore
+        run: dotnet tool restore
+      - name: Restore
+        run: dotnet restore ${{ inputs.solution-file }}
+      - name: Clean
+        run: dotnet clean ${{ inputs.solution-file }} --configuration ${{ inputs.configuration }}
+      - name: Build
+        run: dotnet build ${{ inputs.solution-file }} --configuration ${{ inputs.configuration }}
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ inputs.artifact-prefix }}-build-${{ inputs.configuration }}
+          path: |
+            ${{ inputs.directory }}/**/bin/
+            ${{ inputs.directory }}/**/obj/
+          if-no-files-found: error
+      - name: Test
+        run: >-
+          dotnet test ${{ inputs.solution-file }}
+          --configuration ${{ inputs.configuration }}
+          --collect "Code Coverage"
+          --logger trx
+#          --collect "XPlat Code Coverage"
+      - name: Upload Test Results Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ inputs.artifact-prefix }}-test-${{ inputs.configuration }}
+          path: |
+            ${{ inputs.directory }}/**/TestResults/**/*.trx
+            ${{ inputs.directory }}/**/*.coverage
+          if-no-files-found: warn
