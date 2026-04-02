@@ -123,7 +123,7 @@ jobs:
     uses: silnith/github-workflows/.github/workflows/publish-test-results.yaml@main
     with:
       check-name: C++ Test Results
-      artifact-pattern: msbuild-vstest-test-results-*
+      artifact-pattern: msbuild-vstest-*
       artifact-path: .
       test-result-files: "**/TestResults/**/*.trx"
     secrets: inherit

@@ -92,7 +92,7 @@ jobs:
       - name: Upload Test Results Artifact
         uses: actions/upload-artifact@v7
         with:
-          name: ${{ inputs.artifact-prefix }}-vstest-test-results-${{ inputs.platform }}-${{ inputs.configuration }}
+          name: ${{ inputs.artifact-prefix }}-vstest-${{ inputs.platform }}-${{ inputs.configuration }}
           path: |
             ${{ inputs.directory }}/**/TestResults/**/*.trx
             ${{ inputs.directory }}/**/*.coverage
