@@ -44,7 +44,7 @@ jobs:
   get-date:
     name: Date
     uses: silnith/github-workflows/.github/workflows/bash-get-date.yaml@main
-  cpp-nuget:
+  nuget-cache:
     name: NuGet Cache
     permissions:
       contents: read
@@ -59,14 +59,14 @@ jobs:
       month: ${{ needs.get-date.outputs.month }}
       day: ${{ needs.get-date.outputs.day }}
     secrets: inherit
-  cpp-build-intel:
+  msbuild-intel:
     name: C++ Intel
     permissions:
       contents: read
       packages: read
     needs:
       - get-date
-      - cpp-nuget
+      - nuget-cache
     strategy:
       matrix:
         platform:
@@ -77,7 +77,7 @@ jobs:
           - Release
     uses: silnith/github-workflows/.github/workflows/msbuild-intel.yaml@main
     with:
-      artifact-prefix: cpp
+      artifact-prefix: msbuild
       directory: .
       solution-file: foo.sln
       platform: ${{ matrix.platform }}
@@ -86,14 +86,14 @@ jobs:
       month: ${{ needs.get-date.outputs.month }}
       day: ${{ needs.get-date.outputs.day }}
     secrets: inherit
-  cpp-build-arm:
+  msbuild-arm:
     name: C++ ARM
     permissions:
       contents: read
       packages: read
     needs:
       - get-date
-      - cpp-nuget
+      - nuget-cache
     strategy:
       matrix:
         platform:
@@ -104,7 +104,7 @@ jobs:
           - Release
     uses: silnith/github-workflows/.github/workflows/msbuild-arm.yaml@main
     with:
-      artifact-prefix: cpp
+      artifact-prefix: msbuild
       directory: .
       solution-file: foo.sln
       platform: ${{ matrix.platform }}
@@ -113,20 +113,19 @@ jobs:
       month: ${{ needs.get-date.outputs.month }}
       day: ${{ needs.get-date.outputs.day }}
     secrets: inherit
-  cpp-test-results:
+  vstest-results:
     name: Publish VSTest Results
     permissions:
       checks: write
     needs:
-      - cpp-build-intel
-      - cpp-build-arm
+      - msbuild-intel
+      - msbuild-arm
     uses: silnith/github-workflows/.github/workflows/publish-test-results.yaml@main
     with:
       check-name: C++ Test Results
-      artifact-pattern: cpp-vstest-test-results-*
+      artifact-pattern: msbuild-vstest-test-results-*
       artifact-path: .
-      test-result-files: |
-        cpp/**/TestResults/**/*.trx
+      test-result-files: "**/TestResults/**/*.trx"
     secrets: inherit
 ```
 
@@ -168,7 +167,7 @@ jobs:
           - Release
     uses: silnith/github-workflows/.github/workflows/dotnet-build.yaml@main
     with:
-      artifact-prefix: csharp
+      artifact-prefix: dotnet
       directory: .
       solution-file: foo.sln
       configuration: ${{ matrix.configuration }}
@@ -186,9 +185,9 @@ jobs:
     uses: silnith/github-workflows/.github/workflows/publish-test-results.yaml@main
     with:
       check-name: .NET Test Results
-      artifact-pattern: csharp-dotnet-test-results-*
+      artifact-pattern: dotnet-test-results-*
       artifact-path: .
-      test-result-files: ./**/TestResults/**/*.trx
+      test-result-files: "**/TestResults/**/*.trx"
     secrets: inherit
 ```
 
@@ -223,7 +222,7 @@ jobs:
       - maven-cache
     uses: silnith/github-workflows/.github/workflows/maven-verify.yaml@main
     with:
-      artifact-prefix: java
+      artifact-prefix: maven
       directory: .
       year: ${{ needs.get-date.outputs.year }}
       month: ${{ needs.get-date.outputs.month }}
@@ -240,7 +239,7 @@ jobs:
       - maven-verify
     uses: silnith/github-workflows/.github/workflows/maven-deploy.yaml@main
     with:
-      artifact-prefix: java
+      artifact-prefix: maven
       directory: .
       year: ${{ needs.get-date.outputs.year }}
       month: ${{ needs.get-date.outputs.month }}
@@ -255,7 +254,7 @@ jobs:
     uses: silnith/github-workflows/.github/workflows/publish-test-results.yaml@main
     with:
       check-name: Java Test Results
-      artifact-pattern: java-target
+      artifact-pattern: maven-target
       artifact-path: .
       test-result-files: |
         ./**/target/surefire-reports/TEST-*.xml
