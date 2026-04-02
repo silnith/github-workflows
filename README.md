@@ -185,7 +185,7 @@ jobs:
     uses: silnith/github-workflows/.github/workflows/publish-test-results.yaml@main
     with:
       check-name: .NET Test Results
-      artifact-pattern: dotnet-test-results-*
+      artifact-pattern: dotnet-test-*
       artifact-path: .
       test-result-files: "**/TestResults/**/*.trx"
     secrets: inherit
