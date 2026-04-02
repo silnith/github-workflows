@@ -2,6 +2,41 @@
 
 Standard GitHub workflows that use best practices for building and testing software.
 
+## Why So Complicated?
+
+There are a lot of pieces for a robust build.  Setting up toolchains, fetching
+dependency packages, running the build, running the test suites, archiving the
+built artifacts, publishing the test results, and more.
+
+### Caching
+
+Perhaps the most frustrating part is needing to implement a fairly complex
+sequence of steps just to cache commonly-used data such as dependency packages.
+Most dependency management systems like Maven and NuGet have their own caching
+mechanism built-in.  Unfortunately, these rely on having a persistent filesystem
+to hold the cache, and OCI container-based builds do not provide that, their
+filesystems are ephemeral.  GitHub provides a Cache action, but it functions as
+a single cache, and dependencies are a web of individual entries that need to
+be cached separately.
+
+The standard GitHub advice is to just archive the entire collection under a
+generated key based on a fingerprint of the files declaring the dependencies.
+This advice is... naive at best.  Complex Java software can have scores, even
+hundreds of libraries in its dependency tree.  Normal development often includes
+updating one or two of these libraries at a time.  Using the GitHub advice would
+mean each of these individual updates would change the fingerprint, causing the
+cache to miss and forcing the build to re-download all of the dependencies, not
+just the couple that were modified.
+
+Instead, these workflows provide a different cache naming system that offers a
+more graceful fallback path.  Caches are named based primarily on the date of the
+build in ISO 8601 format.  When checking the cache, it falls back to matching
+prefixes so that previous dependency trees can be used as a starting point for
+rebuilding the current dependency tree.
+
+Of course, none of this would be necessary if GitHub offered colocated mirrors
+for Maven Central and NuGet.org.
+
 ## C++
 
 ```yaml
