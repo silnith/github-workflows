@@ -108,6 +108,17 @@ jobs:
             maven
           path: |
             ~/.m2/repository
+      - name: Fetch Cached PGP Keys
+        uses: actions/cache/restore@v5
+        with:
+          key: pgp-${{ inputs.year }}-${{ inputs.month }}-${{ inputs.day }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            pgp-${{ inputs.year }}-${{ inputs.month }}-${{ inputs.day }}
+            pgp-${{ inputs.year }}-${{ inputs.month }}
+            pgp-${{ inputs.year }}
+            pgp
+          path: |
+            ~/.m2/repository/pgpkeys-cache/
       - name: Fetch Cached NVD Data
         uses: actions/cache/restore@v5
         with:
