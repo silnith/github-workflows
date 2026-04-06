@@ -10,7 +10,7 @@ on:
       java-version:
         description: The version of Java to use for initializing the Maven cache.
         type: string
-        default: 25
+        default: 21
       year:
         description: The current year.
         type: string

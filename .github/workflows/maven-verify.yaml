@@ -14,7 +14,7 @@ on:
       java-version:
         description: The version of Java to use.
         type: string
-        default: 25
+        default: 21
       year:
         description: The current year.
         type: string
