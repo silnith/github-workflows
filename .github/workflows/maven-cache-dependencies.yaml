@@ -82,9 +82,7 @@ jobs:
       # the new "marketing" version numbers.
       - id: create-toolchains-file
         name: Configure Maven Toolchains
-        env:
-          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-        uses: cactuslab/maven-toolchains-xml-action@v2
+        uses: cactuslab/maven-toolchains-xml-action@v3
         with:
           toolchains: |
             [
