@@ -24,6 +24,8 @@ jobs:
   publish-test-results:
     name: Publish Test Results
     permissions:
+      contents: read
+      issues: read
       checks: write
     runs-on: ubuntu-latest
     steps:
