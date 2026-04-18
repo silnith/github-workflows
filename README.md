@@ -114,8 +114,10 @@ jobs:
       day: ${{ needs.get-date.outputs.day }}
     secrets: inherit
   vstest-results:
-    name: Publish VSTest Results
+    name: VSTest Results
     permissions:
+      contents: read
+      issues: read
       checks: write
     needs:
       - msbuild-intel
@@ -179,6 +181,8 @@ jobs:
   dotnet-test-results:
     name: .NET Test Results
     permissions:
+      contents: read
+      issues: read
       checks: write
     needs:
       - dotnet-build
@@ -248,6 +252,8 @@ jobs:
   maven-test-results:
     name: Maven Test Results
     permissions:
+      contents: read
+      issues: read
       checks: write
     needs:
       - maven-verify
