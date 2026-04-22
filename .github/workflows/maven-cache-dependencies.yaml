@@ -82,7 +82,7 @@ jobs:
       # the new "marketing" version numbers.
       - id: create-toolchains-file
         name: Configure Maven Toolchains
-        uses: cactuslab/maven-toolchains-xml-action@v3
+        uses: cactuslab/maven-toolchains-xml-action@v2
         with:
           toolchains: |
             [
