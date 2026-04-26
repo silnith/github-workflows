@@ -3,6 +3,10 @@ name: Maven
 on:
   workflow_call:
     inputs:
+      artifact-prefix:
+        description: A prefix for artifact names.
+        type: string
+        default: maven
       directory:
         description: The directory in which to run the build.
         type: string
